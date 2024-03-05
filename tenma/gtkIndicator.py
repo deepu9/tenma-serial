@@ -90,8 +90,6 @@ class gtkController():
         try:
             if not self.T:
                 self.T = instantiate_tenma_class_from_device_response(self.serialPort)
-            else:
-                self.T.setPort(self.serialPort)
         except Exception as e:
             self.setItemSetStatus(False)
             notify.Notification.new("<b>ERROR</b>", repr(e),

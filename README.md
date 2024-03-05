@@ -38,6 +38,10 @@ explanation of the original code in:
 
 ## Installing
 
+### Using Poetry
+
+    poetry install
+
 ### From pip
 
     pip install tenma-serial

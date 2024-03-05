@@ -1,0 +1,2 @@
+class TenmaException(Exception):
+    pass
