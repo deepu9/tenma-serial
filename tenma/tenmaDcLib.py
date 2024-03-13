@@ -37,7 +37,7 @@
 """
 
 
-def instantiate_tenma_class_from_device_response(device, debug=False):
+def get_tenma_device(device, debug=False):
     """
         Get a proper Tenma subclass depending on the version
         response from the unit.

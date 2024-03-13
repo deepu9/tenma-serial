@@ -35,9 +35,9 @@ from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 
 try:
-    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+    from tenma.tenmaDcLib import get_tenma_device
 except Exception:
-    from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+    from tenmaDcLib import get_tenma_device
 
 
 APPINDICATOR_ID = 'Tenma DC Power'
@@ -81,7 +81,6 @@ class gtkController():
 
         self.T = None
         self.itemSet = []
-        pass
 
     def portSelected(self, source):
         oldPort = self.serialPort
@@ -89,7 +88,7 @@ class gtkController():
 
         try:
             if not self.T:
-                self.T = instantiate_tenma_class_from_device_response(self.serialPort)
+                self.T = get_tenma_device(self.serialPort)
         except Exception as e:
             self.setItemSetStatus(False)
             notify.Notification.new("<b>ERROR</b>", repr(e),

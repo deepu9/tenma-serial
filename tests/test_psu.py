@@ -5,7 +5,8 @@ import sys
 
 import serial
 
-from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+from tenma.exceptions.base_exception import TenmaException
+from tenma.tenmaDcLib import get_tenma_device
 
 def forAllChannels(psu, func):
     for channel in range(1, psu.NCHANNELS + 1):
@@ -19,7 +20,7 @@ def forAllChannels(psu, func):
 def tenma_psu():
     port = os.getenv('TENMA_PORT', None)
     if port:
-        psu = instantiate_tenma_class_from_device_response(port, debug=True)
+        psu = get_tenma_device(port, debug=True)
     else:
         if sys.platform.startswith('win'):
             ports = ['COM%s' % i for i in range(1, 256)]
@@ -33,7 +34,7 @@ def tenma_psu():
         # find the port where the PSU is connected
         for comport in ports:
             try:
-                psu = instantiate_tenma_class_from_device_response(comport, debug=True)
+                psu = get_tenma_device(comport, debug=True)
             except (OSError, serial.SerialException):
                 pass
     # for safety, turn off the PSU

@@ -22,10 +22,10 @@ import click
 # TODO this is just a trick so tenmaControl runs cleanly from both the source tree
 # and the pip installation
 try:
-    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response
+    from tenma.tenmaDcLib import get_tenma_device
     from tenma.exceptions.base_exception import TenmaException
 except Exception:
-    from tenmaDcLib import instantiate_tenma_class_from_device_response
+    from tenmaDcLib import get_tenma_device
     from exceptions.base_exception import TenmaException
 
 
@@ -68,7 +68,7 @@ def main(
     T = None
 
     try:
-        T = instantiate_tenma_class_from_device_response(device, debug)
+        T = get_tenma_device(device, debug)
 
         if not script:
             print(f"VERSION: {T.getVersion()}")

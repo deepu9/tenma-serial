@@ -1,5 +1,4 @@
 import time
-from typing import Union
 import serial
 
 
@@ -7,7 +6,6 @@ class TenmaSerialHandler:
     """
     A small class that handles serial communication for tenma power supplies.
     """
-
     def __init__(
         self,
         serialPort: str,
@@ -15,7 +13,7 @@ class TenmaSerialHandler:
         debug: bool = False,
         baud_rate: int = 9600,
         parity: str = serial.PARITY_NONE,
-        stopbits: Union[int, float] = serial.STOPBITS_ONE
+        stopbits: int | float = serial.STOPBITS_ONE
     ):
         """
             :param serialPort: COM/tty device
@@ -41,7 +39,7 @@ class TenmaSerialHandler:
         if self.debug:
             print(">> ", command.strip())
         
-        command = command + self.serial_eol
+        command = f"{command}{self.serial_eol}"
 
         self.ser.write(command.encode("ascii"))
         # Give it time to process
