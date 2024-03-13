@@ -19,6 +19,10 @@ classifiers = [
     "Programming Language :: Python",
 ]
 
+[tool.poetry.scripts]
+tenma-control = "tenma.commands.cli:main"
+tenma-applet = "tenma.gtkIndicator:main"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 pyserial = "^3.5"

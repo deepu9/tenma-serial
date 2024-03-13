@@ -36,20 +36,16 @@ except Exception:
 @click.option('-C', '--channel', help='channel to set (if not provided, 1 will be used)', type=int, default=1)
 @click.option('-s', '--save', help='Save current configuration to Memory', type=int)
 @click.option('-r', '--recall', help='Load configuration from Memory', type=int)
-@click.option('-S', '--status', help='Retrieve and print system status', action="store_true", default=False)
-@click.option('--ocp-enable', dest="ocp", help='Enable overcurrent protection', action="store_true", default=None)
-@click.option('--ocp-disable', dest="ocp", help='Disable overcurrent pritection', action="store_false", default=None)
-@click.option('--ovp-enable', dest="ovp", help='Enable overvoltage protection', action="store_true", default=None)
-@click.option('--ovp-disable', dest="ovp",  help='Disable overvoltage pritection', action="store_false", default=None)
-@click.option('--beep-enable', dest="beep", help='Enable beeps from unit', action="store_true", default=None)
-@click.option('--beep-disable', dest="beep", help='Disable beeps from unit', action="store_false", default=None)
-@click.option('--on', help='Set output to ON', action="store_true", default=False)
-@click.option('--off', help='Set output to OFF', action="store_true", default=False)
-@click.option('--verbose', help='Chatty program', action="store_true", default=False)
-@click.option('--debug', help='print serial commands', action="store_true", default=False)
-@click.option('--script', help='runs from script. Only print result of query, no version', action="store_true", default=False)
-@click.option('--runningCurrent', help='returns the running output current', action="store_true", default=False)
-@click.option('--runningVoltage', help='returns the running output voltage',action="store_true", default=False)
+@click.option('-S', '--status', help='Retrieve and print system status', default=False, type=bool)
+@click.option('--ocp', help='Enable or Disable overcurrent protection', type=bool)
+@click.option('--ovp', help='Enable or Disable overvoltage protection', type=bool)
+@click.option('--beep', help='Enable or Disable beeps from unit', type=bool)
+@click.option('--output', help='Set output to either ON or OFF', default=False, type=bool)
+@click.option('--verbose', help='Chatty program', default=False, type=bool)
+@click.option('--debug', help='print serial commands', default=False, type=bool)
+@click.option('--script', help='runs from script. Only print result of query, no version', default=False, type=bool)
+@click.option('--runningCurrent', help='returns the running output current', action="store_true", default=False, type=bool)
+@click.option('--runningVoltage', help='returns the running output voltage',action="store_true", default=False, type=bool)
 def main(
     device: str,
     voltage: int,
@@ -58,14 +54,10 @@ def main(
     save: int,
     recall: int,
     status: bool,
-    ocp_enable: bool,
-    ocp_disable: bool,
-    ovp_enable: bool,
-    ovp_disable: bool,
-    beep_enable: bool,
-    beep_disable: bool,
-    on: bool,
-    off: bool,
+    ocp: bool,
+    ovp: bool,
+    beep: bool,
+    output: bool,
     verbose: bool,
     debug: bool,
     script: bool,
@@ -74,9 +66,10 @@ def main(
 ):
 
     T = None
+
     try:
-        VERB = verbose
         T = instantiate_tenma_class_from_device_response(device, debug)
+
         if not script:
             print(f"VERSION: {T.getVersion()}")
 
@@ -84,58 +77,58 @@ def main(
         # perform the current/voltage/options setting
         # and after that, perform the save
         if save:
-            if VERB:
+            if verbose:
                 print("Recalling Memory", save)
 
             T.OFF()  # Turn off for safety
             T.recallConf(save)
 
         # Now, with memory, or no memory handling, perform the changes
-        if ocp is not None:
-            if VERB:
-                if args["ocp"]:
+        if ocp:
+            if verbose:
+                if ocp:
                     print("Enable overcurrent protection")
                 else:
                     print("Disable overcurrent protection")
 
-            T.setOCP(args["ocp"])
+            T.setOCP(ocp)
 
-        if args["ovp"] is not None:
-            if VERB:
-                if args["ovp"]:
+        if ovp:
+            if verbose:
+                if ovp:
                     print("Enable overvoltage protection")
                 else:
                     print("Disable overvoltage protection")
 
-            T.setOVP(args["ovp"])
+            T.setOVP(ovp)
 
-        if args["beep"] is not None:
-            if VERB:
-                if args["beep"]:
+        if beep:
+            if verbose:
+                if beep:
                     print("Enable unit beep")
                 else:
                     print("Disable unit beep")
 
-            T.setBEEP(args["beep"])
+            T.setBEEP(beep)
 
         if voltage:
-            if VERB:
+            if verbose:
                 print(f"Setting voltage to {voltage}")
             T.setVoltage(channel, voltage)
 
         if current:
-            if VERB:
+            if verbose:
                 print("Setting current to ", current)
             T.setCurrent(channel, current)
 
         if save:
-            if VERB:
+            if verbose:
                 print("Saving to Memory", save)
 
             T.saveConfFlow(save, channel)
 
         if recall:
-            if VERB:
+            if verbose:
                 print("Loading from Memory: ", recall)
 
             T.recallConf(recall)
@@ -146,35 +139,35 @@ def main(
             print("Voltage:", volt)
             print("Current:", curr)
 
-        if off:
-            if VERB:
+        if output:
+            if verbose:
+                print("Turning OUTPUT ON")
+            
+            T.ON()
+        else:
+            if verbose:
                 print("Turning OUTPUT OFF")
             T.OFF()
 
-        if on:
-            if VERB:
-                print("Turning OUTPUT ON")
-            T.ON()
-
         if status:
-            if VERB:
+            if verbose:
                 print("Retrieving status")
             print(T.getStatus())
 
         if running_current:
-            if VERB:
+            if verbose:
                 print("Retrieving running Current")
             print(T.runningCurrent(channel))
 
         if running_voltage:
-            if VERB:
+            if verbose:
                 print("Retrieving running Voltage")
             print(T.runningVoltage(channel))
 
     except TenmaException as e:
         print("Lib ERROR: ", repr(e))
     finally:
-        if VERB:
+        if verbose:
             print("Closing connection")
         if T:
             T.close()
